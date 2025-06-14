@@ -7,7 +7,6 @@ export default function tabsLayout (){
     <Tabs.Screen name="index" options={{title: "Dashboard"}}></Tabs.Screen>
     <Tabs.Screen name="[id]" options={{title: "Notes"}}></Tabs.Screen>
      {/* <Tabs.Screen name="form" options={{title: "Form"}}></Tabs.Screen> */}
-    <Tabs.Screen name="todos" options={{title: "Todos" }}></Tabs.Screen>
   </Tabs>
   )
 }

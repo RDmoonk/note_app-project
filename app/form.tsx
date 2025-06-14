@@ -2,11 +2,19 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, SectionList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
+
+
 
 export default function Form() {
   const [title, setTitle] = useState('');
   const [note, setNote] = useState('');
   const [selectedImportance, setSelectedImportance] = useState('');
+  const [editId, setEditId] = useState<number | null>(null);
+
+  const params = useLocalSearchParams();
+const router = useRouter();
 
   const importanceData = [
     {
@@ -15,33 +23,64 @@ export default function Form() {
     }
   ];
 
-  const saveNote = async () => {
-    try {
-      const newNote = { title, note, importance: selectedImportance };
-      const existingNotesJSON = await AsyncStorage.getItem('notes');
-      const existingNotes = existingNotesJSON ? JSON.parse(existingNotesJSON) : [];
+const saveNote = async (newNote: any) => {
+  try {
+    const existingNotesJSON = await AsyncStorage.getItem('notes');
+    const existingNotes = existingNotesJSON ? JSON.parse(existingNotesJSON) : [];
 
-      const updatedNotes = [...existingNotes, newNote];
-      await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
-    } catch (error) {
-      Alert.alert('Erreur', 'Impossible de sauvegarder la note.');
-    }
+    const updatedNotes = newNote.id
+      ? existingNotes.map((n: any) => (n.id === newNote.id ? newNote : n))
+      : [...existingNotes, newNote];
+
+    await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
+  } catch (error) {
+    Alert.alert('Erreur', 'Impossible de sauvegarder la note.');
+  }
+};
+
+ const handleSubmit = async () => {
+  if (!title || !note || !selectedImportance) {
+    Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+    return;
+  }
+
+  const newNote = {
+    id: editId || Date.now(),
+    title,
+    note,
+    importance: selectedImportance,
   };
 
-  const handleSubmit = async () => {
-    if (!title || !note || !selectedImportance) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
-      return;
-    }
+  try {
+    const notesJSON = await AsyncStorage.getItem('notes');
+    const savedNotes = notesJSON ? JSON.parse(notesJSON) : [];
 
-    await saveNote();
+    const updatedNotes = editId
+      ? savedNotes.map((n: any) => (n.id === editId ? newNote : n))
+      : [...savedNotes, newNote];
 
-    // Reset
+    await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
+
     setTitle('');
     setNote('');
     setSelectedImportance('');
-    Alert.alert('Succès', 'Note enregistrée localement.');
-  };
+    setEditId(null);
+
+    Alert.alert('Succès', 'Note enregistrée.');
+    router.push('/index'); // retour
+  } catch (error) {
+    Alert.alert('Erreur', 'Échec de la sauvegarde.');
+  }
+};
+
+  useEffect(() => {
+    if (params?.id){
+        setTitle(params.title as string);
+    setNote(params.note as string);
+    setSelectedImportance(params.importance as string);
+    setEditId(Number(params.id));
+    }
+  }, [params])
 
   return (
     <View>

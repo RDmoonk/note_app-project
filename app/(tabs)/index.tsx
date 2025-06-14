@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 type Note = {
+  id: number;
   title: string;
   note: string;
   importance: string;
@@ -12,6 +13,10 @@ type Note = {
 
 export default function NotePage() {
   const [notes, setNotes] = useState<Note[]>([]);
+
+  const router = useRouter();
+
+  
 
   const loadNotes = async () => {
     try {
@@ -22,6 +27,14 @@ export default function NotePage() {
       console.log('Erreur de lecture des notes', error);
     }
   };
+
+  // for the delete
+  const handleDelete = async (id:number) => {
+    const updateNotes = notes.filter(note => note.id !== id);
+    setNotes(updateNotes);
+    await AsyncStorage.setItem('notes', JSON.stringify(updateNotes))
+  }
+
 
   useEffect(() => {
     loadNotes();
@@ -37,6 +50,21 @@ export default function NotePage() {
           <View style={styles.noteItem}>
             <Text style={styles.noteTitle}>{item.title} ({item.importance})</Text>
             <Text>{item.note}</Text>
+
+            <View>
+              <Button
+              title='Edit'
+              onPress={() => router.push({pathname: '/form', params: item})}
+              />
+            </View>
+
+            <View>
+              <Button
+              title='Delete'
+              color="red"
+              onPress={() => handleDelete(item.id)}
+              />
+            </View>
           </View>
         )}
       />
