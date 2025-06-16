@@ -9,6 +9,7 @@ type Note = {
   title: string;
   note: string;
   importance: string;
+  date: string;
 };
 
 export default function NotePage() {
@@ -18,7 +19,7 @@ export default function NotePage() {
 
   const router = useRouter();
 
-  const showDate = new Date(8.64e15).toString(); 
+  const showDate = new Date().toString(); 
 
   useEffect(() => {
     const tmer = setInterval(() =>{
@@ -51,6 +52,11 @@ export default function NotePage() {
 
   return (
     <View style={styles.container}>
+        <Button
+      title="Add a note"
+      onPress={() => router.push("/form")}
+      />
+
       <Text style={styles.heading}>Saved notes :</Text>
       <FlatList
         data={notes}
@@ -60,7 +66,7 @@ export default function NotePage() {
             <Text style={styles.noteTitle}>{item.title} ({item.importance})</Text>
             <Text>{item.note}</Text>
 
-            <Text>{currentDateTime.toLocaleString()}</Text>
+            <Text>Date: {item.date}</Text>
 
             <View>
               <Button
@@ -82,10 +88,7 @@ export default function NotePage() {
         )}
       />
 
-       <Button
-      title="Add a note"
-      onPress={() => router.push("/form")}
-      />
+     
     </View>
   );
 }

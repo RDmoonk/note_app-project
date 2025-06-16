@@ -49,6 +49,7 @@ const saveNote = async (newNote: any) => {
     title,
     note,
     importance: selectedImportance,
+    date: new Date().toLocaleDateString()
   };
 
   try {
