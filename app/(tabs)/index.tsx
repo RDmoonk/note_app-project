@@ -13,10 +13,19 @@ type Note = {
 
 export default function NotePage() {
   const [notes, setNotes] = useState<Note[]>([]);
+  // set the use state for the value time
+  const [currentDateTime, setcurrentDateTime] = useState(new Date())
 
   const router = useRouter();
 
-  
+  const showDate = new Date(8.64e15).toString(); 
+
+  useEffect(() => {
+    const tmer = setInterval(() =>{
+      setcurrentDateTime(new Date())
+    }, 1000 )
+    return()=>clearInterval(tmer);
+  }, []);
 
   const loadNotes = async () => {
     try {
@@ -51,6 +60,8 @@ export default function NotePage() {
             <Text style={styles.noteTitle}>{item.title} ({item.importance})</Text>
             <Text>{item.note}</Text>
 
+            <Text>{currentDateTime.toLocaleString()}</Text>
+
             <View>
               <Button
               title='Edit'
@@ -64,6 +75,8 @@ export default function NotePage() {
               color="red"
               onPress={() => handleDelete(item.id)}
               />
+
+              
             </View>
           </View>
         )}
@@ -72,11 +85,6 @@ export default function NotePage() {
        <Button
       title="Add a note"
       onPress={() => router.push("/form")}
-      />
-
-      <Button
-      title="Notes test"
-      onPress={() => router.push("/[id]/notesPage")}
       />
     </View>
   );

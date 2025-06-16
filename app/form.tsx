@@ -67,7 +67,7 @@ const saveNote = async (newNote: any) => {
     setEditId(null);
 
     Alert.alert('Succès', 'Note enregistrée.');
-    router.push('/index'); // retour
+    // router.push(); // retour
   } catch (error) {
     Alert.alert('Erreur', 'Échec de la sauvegarde.');
   }
