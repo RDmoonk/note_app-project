@@ -52,7 +52,7 @@ export default function NotePage() {
           <View style={styles.noteItem}>
             <Text style={styles.noteTitle}>{item.title} ({item.importance})</Text>
             <Text style={styles.noteDate}>{item.date}</Text>
-            <Text>{item.note}</Text>
+            <Text numberOfLines={2} ellipsizeMode='tail'>{item.note}</Text>
             <View>
               <Button
                 title='Edit'
@@ -75,6 +75,13 @@ export default function NotePage() {
                 title='Delete'
                 color="red"
                 onPress={() => handleDelete(item.id)}
+              />
+
+              {/* button to go to the page of the full note */}
+              <Button
+              title='see more...'
+              onPress={() => router.push({pathname: '/noteDetails', params: {id: item.id.toString()}})}
+              color="gray"
               />
             </View>
           </View>
