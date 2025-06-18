@@ -1,4 +1,4 @@
-// src/screens/NotePage.tsx
+// NotePage.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,19 +14,7 @@ type Note = {
 
 export default function NotePage() {
   const [notes, setNotes] = useState<Note[]>([]);
-  // set the use state for the value time
-  const [currentDateTime, setcurrentDateTime] = useState(new Date())
-
   const router = useRouter();
-
-  const showDate = new Date().toString(); 
-
-  useEffect(() => {
-    const tmer = setInterval(() =>{
-      setcurrentDateTime(new Date())
-    }, 1000 )
-    return()=>clearInterval(tmer);
-  }, []);
 
   const loadNotes = async () => {
     try {
@@ -38,13 +26,12 @@ export default function NotePage() {
     }
   };
 
-  // for the delete
-  const handleDelete = async (id:number) => {
-    const updateNotes = notes.filter(note => note.id !== id);
-    setNotes(updateNotes);
-    await AsyncStorage.setItem('notes', JSON.stringify(updateNotes))
-  }
-
+  // logique de suppression, en prenant l'id (qui est un nombre) de la note en paramètre, cela permet de update la note pour ensuite la supprimer
+  const handleDelete = async (id: number) => {
+    const updatedNotes = notes.filter(note => note.id !== id);
+    setNotes(updatedNotes);
+    await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
+  };
 
   useEffect(() => {
     loadNotes();
@@ -52,37 +39,43 @@ export default function NotePage() {
 
   return (
     <View style={styles.container}>
-        <Button
-      title="Add a note"
-      onPress={() => router.push("/form")}
-      />
-
       <Text style={styles.heading}>Saved notes :</Text>
+
+      {/* Bouton qui envoie vers le form */}
+       <Button title="Add a note" onPress={() => router.push("/form")} />
+
+        {/* le corps de la note qui va récupérer les données entrée dans le form et les appliqués ici en apparaissant */}
       <FlatList
         data={notes}
-        keyExtractor={(_, index) => index.toString()}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.noteItem}>
             <Text style={styles.noteTitle}>{item.title} ({item.importance})</Text>
+            <Text style={styles.noteDate}>{item.date}</Text>
             <Text>{item.note}</Text>
-
-            <Text>Date: {item.date}</Text>
-
             <View>
               <Button
-              title='Edit'
-              onPress={() => router.push({pathname: '/form', params: item})}
+                title='Edit'
+                onPress={() =>
+                  router.push({
+                    pathname: '/form',
+                    params: {
+                      id: String(item.id),
+                      title: item.title,
+                      note: item.note,
+                      importance: item.importance
+                    }
+                  })
+                }
               />
             </View>
-
             <View>
+              {/* bouton qui prend la logique de handleDelete lorsque l'on appuie dessus */}
               <Button
-              title='Delete'
-              color="red"
-              onPress={() => handleDelete(item.id)}
+                title='Delete'
+                color="red"
+                onPress={() => handleDelete(item.id)}
               />
-
-              
             </View>
           </View>
         )}
@@ -97,5 +90,6 @@ const styles = StyleSheet.create({
   container: { padding: 20, marginTop: 40 },
   heading: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
   noteItem: { backgroundColor: '#eee', padding: 10, borderRadius: 5, marginVertical: 5 },
-  noteTitle: { fontWeight: 'bold' }
+  noteTitle: { fontWeight: 'bold' },
+  noteDate: { fontSize: 12, color: 'gray', marginBottom: 4 }
 });

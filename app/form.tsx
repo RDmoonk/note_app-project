@@ -1,10 +1,7 @@
-// src/components/Form.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, SectionList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect } from 'react';
-
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 
 export default function Form() {
@@ -13,8 +10,51 @@ export default function Form() {
   const [selectedImportance, setSelectedImportance] = useState('');
   const [editId, setEditId] = useState<number | null>(null);
 
+  const router = useRouter();
   const params = useLocalSearchParams();
-const router = useRouter();
+  const { id, title: paramTitle, note: paramNote, importance: paramImportance } = useLocalSearchParams();
+
+
+// const handleSubmit qui va, à l'aide de async storage, d'abord envoyé une alerte d'erreur si aucun champ n'est rempli
+  const handleSubmit = async () => {
+  if (!title || !note || !selectedImportance) {
+    Alert.alert('Error', 'Enter the areas');
+    return; 
+  } else{
+    Alert.alert('The note has been saved')
+  }
+
+  const existingNotesJSON = await AsyncStorage.getItem('notes');
+  const existingNotes = existingNotesJSON ? JSON.parse(existingNotesJSON) : [];
+
+  let updatedNotes;
+
+  if (id) {
+    // Modifier la note existante
+    updatedNotes = existingNotes.map((n: any) =>
+      n.id == id ? { ...n, title, note, importance: selectedImportance } : n
+    );
+  } else {
+    // Ajouter une nouvelle note
+    const newNote = {
+      id: Date.now(),
+      title,
+      note,
+      importance: selectedImportance,
+      date: new Date().toLocaleString()
+    };
+    updatedNotes = [...existingNotes, newNote];
+  }
+
+  await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
+
+  // Reset
+  setTitle('');
+  setNote('');
+  setSelectedImportance('');
+  router.push('/');
+};
+
 
   const importanceData = [
     {
@@ -23,65 +63,13 @@ const router = useRouter();
     }
   ];
 
-const saveNote = async (newNote: any) => {
-  try {
-    const existingNotesJSON = await AsyncStorage.getItem('notes');
-    const existingNotes = existingNotesJSON ? JSON.parse(existingNotesJSON) : [];
-
-    const updatedNotes = newNote.id
-      ? existingNotes.map((n: any) => (n.id === newNote.id ? newNote : n))
-      : [...existingNotes, newNote];
-
-    await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
-  } catch (error) {
-    Alert.alert('Erreur', 'Impossible de sauvegarder la note.');
+    useEffect(() => {
+  if (id && paramTitle && paramNote && paramImportance) {
+    setTitle(paramTitle as string);
+    setNote(paramNote as string);
+    setSelectedImportance(paramImportance as string);
   }
-};
-
- const handleSubmit = async () => {
-  if (!title || !note || !selectedImportance) {
-    Alert.alert('Erreur', 'Veuillez remplir tous les champs');
-    return;
-  }
-
-  const newNote = {
-    id: editId || Date.now(),
-    title,
-    note,
-    importance: selectedImportance,
-    date: new Date().toLocaleDateString()
-  };
-
-  try {
-    const notesJSON = await AsyncStorage.getItem('notes');
-    const savedNotes = notesJSON ? JSON.parse(notesJSON) : [];
-
-    const updatedNotes = editId
-      ? savedNotes.map((n: any) => (n.id === editId ? newNote : n))
-      : [...savedNotes, newNote];
-
-    await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
-
-    setTitle('');
-    setNote('');
-    setSelectedImportance('');
-    setEditId(null);
-
-    Alert.alert('Succès', 'Note enregistrée.');
-    // router.push(); // retour
-  } catch (error) {
-    Alert.alert('Erreur', 'Échec de la sauvegarde.');
-  }
-};
-
-  useEffect(() => {
-    if (params?.id){
-        setTitle(params.title as string);
-    setNote(params.note as string);
-    setSelectedImportance(params.importance as string);
-    setEditId(Number(params.id));
-    }
-  }, [params])
+}, [id, paramTitle, paramNote, paramImportance]);
 
   return (
     <View>
