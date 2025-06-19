@@ -82,6 +82,7 @@ export default function Form() {
         onChangeText={setNote}
         value={note}
         multiline
+         numberOfLines={5}
       />
 
       <Text>Importance :</Text>
@@ -108,7 +109,7 @@ export default function Form() {
 
 const styles = StyleSheet.create({
   input: { margin: 10, borderWidth: 1, padding: 10 },
-  textInput: { margin: 10, borderWidth: 1, padding: 10, minHeight: 100 },
+  textInput: { margin: 10, borderWidth: 1, padding: 10, minHeight: 200 },
   importanceItem: { padding: 10, backgroundColor: '#eee', marginVertical: 4 },
   selectedImportance: { backgroundColor: '#add8e6' },
   sectionHeader: { fontWeight: 'bold', marginTop: 10 }

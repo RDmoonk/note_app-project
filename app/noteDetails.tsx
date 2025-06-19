@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,10 +34,11 @@ const NoteDetails = () => {
 
   return (
     <View style={styles.container}>
+      <ScrollView>
         <Text style={styles.title}>{note.title}</Text>
         <Text>{note.date}</Text>
         <Text style={styles.importance}>Importance: {note.importance}</Text>
-        <Text style={styles.body} >{note.note}</Text>
+        <Text style={styles.body} numberOfLines={50} >{note.note}</Text>
 
        <Button
             title='Edit'
@@ -50,6 +51,7 @@ const NoteDetails = () => {
              importance: note.importance}})}
                     />
         <Button title='Delete' color="red" onPress={handleDelete}/>
+        </ScrollView>
     </View>
   );
 }
