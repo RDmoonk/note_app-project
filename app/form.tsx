@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#7ee4ec',
     borderRadius: 10,
-    padding: 12,
+    padding: 20,
     fontSize: 14,
     fontFamily: 'Montserrat',
     backgroundColor: '#ffffff',
@@ -139,13 +139,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#7ee4ec',
     borderRadius: 10,
-    padding: 12,
     fontSize: 14,
     fontFamily: 'Montserrat',
     backgroundColor: '#ffffff',
     color: '#000',
     textAlignVertical: 'top',
     marginBottom: 15,
+    
   },
   sectionHeader: {
     fontFamily: 'Montserrat',
@@ -175,11 +175,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 20,
     alignItems: 'center',
+    margin: 10
   },
   saveButtonText: {
     fontFamily: 'Montserrat',
     fontSize: 16,
     color: '#fff',
     fontWeight: '600',
+    
   }
 });

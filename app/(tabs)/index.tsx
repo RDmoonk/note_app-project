@@ -31,6 +31,22 @@ export default function NotePage() {
     loadNotes();
   }, []);
 
+  const importanceColor = (importance: string) => {
+    switch(importance){
+     case 'Important':
+      return{backgroundColor: '#f45b69'};
+      case 'Normal':
+        return {backgroundColor:'#114b5f'};
+        case 'Just in case':
+        return {backgroundColor: '#7ee4ec'};
+        // this default is a fallback just in case
+        default:
+          return {backgroundColor: '#fff'};
+    }
+  };
+
+  
+
   return (
     <View style={styles.container}>
       {/* section has been used so there is no problem with the nesting  */}
@@ -47,7 +63,11 @@ export default function NotePage() {
     )}
     renderItem={({ item }) => (
       <View style={styles.noteItem}>
-        <Text style={styles.noteTitle}>{item.title} ({item.importance})</Text>
+        <Text style={styles.noteTitle}>{item.title}</Text>
+        {/*  ({item.importance}) */}
+     <View style={[styles.importanceBadge, importanceColor(item.importance)]}>
+      <Text style={styles.importanceText}>{item.importance}</Text>
+    </View>
         <Text style={styles.noteDate}>{item.date}</Text>
         <Text numberOfLines={2} ellipsizeMode='tail'>{item.note}</Text>
 
@@ -96,7 +116,6 @@ const styles = StyleSheet.create({
   noteTitle: {   fontFamily: 'Montserrat',
     fontSize: 18,
     fontWeight: '600',
-    color: '#114b5f',
     marginBottom: 8, },
   noteDate: {     fontFamily: 'Montserrat',
     fontSize: 14,
@@ -143,7 +162,26 @@ AddNoteButton:{
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 10,
-}
+},
+
+noteHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 8,
+},
+
+importanceBadge: {
+  paddingHorizontal: 8,
+  paddingVertical: 4,
+  borderRadius: 8,
+},
+
+importanceText: {
+  fontFamily: 'Montserrat',
+  fontSize: 12,
+  fontWeight: 'bold',
+},
 
 
 });
