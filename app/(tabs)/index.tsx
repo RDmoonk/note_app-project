@@ -48,49 +48,61 @@ export default function NotePage() {
   
 
   return (
-    <View style={styles.container}>
-      {/* section has been used so there is no problem with the nesting  */}
-  <SectionList
-    sections={[
-      {
-        title: 'Saved notes',
-        data: notes
-      }
-    ]}
-    keyExtractor={(item, index) => item.id.toString() || index.toString()}
-    renderSectionHeader={({ section: { title } }) => (
-      <Text style={styles.heading}>{title}</Text>
-    )}
-    renderItem={({ item }) => (
-      <View style={styles.noteItem}>
-        <Text style={styles.noteTitle}>{item.title}</Text>
-        {/*  ({item.importance}) */}
-     <View style={[styles.importanceBadge, importanceColor(item.importance)]}>
-      <Text style={styles.importanceText}>{item.importance}</Text>
-    </View>
-        <Text style={styles.noteDate}>{item.date}</Text>
-        <Text numberOfLines={2} ellipsizeMode='tail'>{item.note}</Text>
-
+  <View style={styles.container}>
+    {notes.length === 0 ? (
+      <>
+        <Text style={styles.emptyMessage}>There is no notes yet</Text>
         <TouchableOpacity
-          onPress={() => router.push({ pathname: '/noteDetails', params: { id: item.id.toString() } })}
-          style={styles.seeMoreButton}
+          onPress={() => router.push("/form")}
+          style={styles.AddNoteButton}
         >
-          <Text>See More...</Text>
+          <Text>Add a note</Text>
         </TouchableOpacity>
-      </View>
+      </>
+    ) : (
+      <>
+        {/* section has been used so there is no problem with the nesting  */}
+        <SectionList
+          sections={[{ title: 'Saved notes', data: notes }]}
+          keyExtractor={(item, index) => item.id.toString() || index.toString()}
+          renderSectionHeader={({ section: { title } }) => (
+            <Text style={styles.heading}>{title}</Text>
+          )}
+          renderItem={({ item }) => (
+            <View style={styles.noteItem}>
+              <Text style={styles.noteTitle}>{item.title}</Text>
+
+              {/* Badge d'importance */}
+              <View style={[styles.importanceBadge, importanceColor(item.importance)]}>
+                <Text style={styles.importanceText}>{item.importance}</Text>
+              </View>
+
+              <Text style={styles.noteDate}>{item.date}</Text>
+              <Text numberOfLines={2} ellipsizeMode="tail">{item.note}</Text>
+
+              <TouchableOpacity
+                onPress={() =>
+                  router.push({ pathname: '/noteDetails', params: { id: item.id.toString() } })
+                }
+                style={styles.seeMoreButton}
+              >
+                <Text>See More...</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          ListFooterComponent={() => (
+            <TouchableOpacity
+              onPress={() => router.push("/form")}
+              style={styles.AddNoteButton}
+            >
+              <Text>Add a note</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </>
     )}
-    ListFooterComponent={() => (
-      <TouchableOpacity
-        onPress={() => router.push("/form")}
-        style={styles.AddNoteButton}
-      >
-        <Text>Add a note</Text>
-      </TouchableOpacity>
-    )}
-  />
-</View>
-    
-  );
+  </View>
+);
 }
 
 // The css of the page using StyleSheet
@@ -181,6 +193,14 @@ importanceText: {
   fontFamily: 'Montserrat',
   fontSize: 12,
   fontWeight: 'bold',
+},
+
+emptyMessage: {
+  fontFamily: 'Montserrat',
+  fontSize: 18,
+  color: '#fff',
+  textAlign: 'center',
+  marginTop: 50,
 },
 
 
