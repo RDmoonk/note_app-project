@@ -1,8 +1,9 @@
 // NotePage.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, SectionList, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import Toast from 'react-native-toast-message';
 
 type Note = {
   id: number;
@@ -26,77 +27,123 @@ export default function NotePage() {
     }
   };
 
-  // logique de suppression, en prenant l'id (qui est un nombre) de la note en paramètre, cela permet de update la note pour ensuite la supprimer
-  const handleDelete = async (id: number) => {
-    const updatedNotes = notes.filter(note => note.id !== id);
-    setNotes(updatedNotes);
-    await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
-  };
-
   useEffect(() => {
     loadNotes();
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Saved notes :</Text>
+      {/* section has been used so there is no problem with the nesting  */}
+  <SectionList
+    sections={[
+      {
+        title: 'Saved notes',
+        data: notes
+      }
+    ]}
+    keyExtractor={(item, index) => item.id.toString() || index.toString()}
+    renderSectionHeader={({ section: { title } }) => (
+      <Text style={styles.heading}>{title}</Text>
+    )}
+    renderItem={({ item }) => (
+      <View style={styles.noteItem}>
+        <Text style={styles.noteTitle}>{item.title} ({item.importance})</Text>
+        <Text style={styles.noteDate}>{item.date}</Text>
+        <Text numberOfLines={2} ellipsizeMode='tail'>{item.note}</Text>
 
-      {/* Bouton qui envoie vers le form */}
-       <Button title="Add a note" onPress={() => router.push("/form")} />
-
-        {/* le corps de la note qui va récupérer les données entrée dans le form et les appliqués ici en apparaissant */}
-      <FlatList
-        data={notes}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.noteItem}>
-            <Text style={styles.noteTitle}>{item.title} ({item.importance})</Text>
-            <Text style={styles.noteDate}>{item.date}</Text>
-            <Text numberOfLines={2} ellipsizeMode='tail'>{item.note}</Text>
-            <View>
-              <Button
-                title='Edit'
-                onPress={() =>
-                  router.push({
-                    pathname: '/form',
-                    params: {
-                      id: String(item.id),
-                      title: item.title,
-                      note: item.note,
-                      importance: item.importance
-                    }
-                  })
-                }
-              />
-            </View>
-            <View>
-              {/* bouton qui prend la logique de handleDelete lorsque l'on appuie dessus */}
-              <Button
-                title='Delete'
-                color="red"
-                onPress={() => handleDelete(item.id)}
-              />
-
-              {/* button to go to the page of the full note */}
-              <Button
-              title='see more...'
-              onPress={() => router.push({pathname: '/noteDetails', params: {id: item.id.toString()}})}
-              color="gray"
-              />
-            </View>
-          </View>
-        )}
-      />
-
-     
-    </View>
+        <TouchableOpacity
+          onPress={() => router.push({ pathname: '/noteDetails', params: { id: item.id.toString() } })}
+          style={styles.seeMoreButton}
+        >
+          <Text>See More...</Text>
+        </TouchableOpacity>
+      </View>
+    )}
+    ListFooterComponent={() => (
+      <TouchableOpacity
+        onPress={() => router.push("/form")}
+        style={styles.AddNoteButton}
+      >
+        <Text>Add a note</Text>
+      </TouchableOpacity>
+    )}
+  />
+</View>
+    
   );
 }
 
+// The css of the page using StyleSheet
 const styles = StyleSheet.create({
-  container: { padding: 20, marginTop: 40 },
-  heading: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
-  noteItem: { backgroundColor: '#eee', padding: 10, borderRadius: 5, marginVertical: 5 },
-  noteTitle: { fontWeight: 'bold' },
-  noteDate: { fontSize: 12, color: 'gray', marginBottom: 4 }
+  container: {     padding: 20,
+    backgroundColor: '#456990',
+    flex: 1, },
+ 
+    heading: {   fontFamily: 'Montserrat',
+    fontSize: 24,
+    color: '#7ee4ec',
+    fontWeight: 'bold',
+    marginBottom: 20, },
+
+  noteItem: {  backgroundColor: '#ffd4ca',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5, },
+  noteTitle: {   fontFamily: 'Montserrat',
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#114b5f',
+    marginBottom: 8, },
+  noteDate: {     fontFamily: 'Montserrat',
+    fontSize: 14,
+    color: '#333', },
+
+    buttonPrimary: {
+  backgroundColor: '#7ee4ec',
+  padding: 12,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginVertical: 5,
+},
+buttonPrimaryText: {
+  fontFamily: 'Montserrat',
+  color: '#114b5f',
+  fontWeight: '600',
+},
+
+buttonDanger: {
+  backgroundColor: '#f45b69',
+  padding: 12,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginVertical: 5,
+},
+buttonDangerText: {
+  fontFamily: 'Montserrat',
+  color: '#fff',
+  fontWeight: '600',
+},
+seeMoreButton: {
+     backgroundColor: '#fa9e8a',
+    padding: 12,
+    marginTop: 5,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+},
+
+AddNoteButton:{
+     backgroundColor: '#7ee4ec',
+    padding: 12,
+    marginTop: 5,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+}
+
+
 });

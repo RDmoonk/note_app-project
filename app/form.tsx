@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, SectionList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Alert, SectionList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 
 export default function Form() {
@@ -102,15 +102,84 @@ export default function Form() {
         )}
       />
 
-      <Button title="Enregistrer" onPress={handleSubmit} />
+    <TouchableOpacity onPress={handleSubmit} 
+    style= {styles.saveButton}>
+      <Text>Save</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
+// The css of the page using StyleSheet
 const styles = StyleSheet.create({
-  input: { margin: 10, borderWidth: 1, padding: 10 },
-  textInput: { margin: 10, borderWidth: 1, padding: 10, minHeight: 200 },
-  importanceItem: { padding: 10, backgroundColor: '#eee', marginVertical: 4 },
-  selectedImportance: { backgroundColor: '#add8e6' },
-  sectionHeader: { fontWeight: 'bold', marginTop: 10 }
+  container: {
+    flex: 1,
+    backgroundColor: '#114b5f',
+    padding: 20,
+  },
+  label: {
+    fontFamily: 'Montserrat',
+    fontSize: 16,
+    color: '#ffd4ca',
+    marginTop: 15,
+    marginBottom: 5,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#7ee4ec',
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 14,
+    fontFamily: 'Montserrat',
+    backgroundColor: '#ffffff',
+    color: '#000',
+    marginBottom: 10,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#7ee4ec',
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 14,
+    fontFamily: 'Montserrat',
+    backgroundColor: '#ffffff',
+    color: '#000',
+    textAlignVertical: 'top',
+    marginBottom: 15,
+  },
+  sectionHeader: {
+    fontFamily: 'Montserrat',
+    fontSize: 16,
+    color: '#f45b69',
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 8,
+  },
+  importanceItem: {
+    padding: 10,
+    backgroundColor: '#456990',
+    marginVertical: 4,
+    borderRadius: 8,
+    fontFamily: 'Montserrat',
+    color: '#fff',
+    margin: 7
+  },
+  selectedImportance: {
+    backgroundColor: '#7ee4ec',
+    color: '#114b5f',
+    fontWeight: 'bold',
+  },
+  saveButton: {
+    backgroundColor: '#f45b69',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    fontFamily: 'Montserrat',
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
+  }
 });
