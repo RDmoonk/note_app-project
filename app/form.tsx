@@ -71,7 +71,7 @@ export default function Form() {
   // Data for the importance section list
   const importanceData = [
     {
-      title: "Importance Level",
+      title: "Priority Level",
       data: ["Important", "Normal", "Just in case"]
     }
   ];
@@ -92,7 +92,7 @@ export default function Form() {
       <Text>Titre :</Text>
       <TextInput style={styles.input} onChangeText={setTitle} value={title} />
 
-      <Text>Contenu :</Text>
+      <Text>Content :</Text>
       <TextInput
         style={styles.textInput}
         onChangeText={setNote}
@@ -101,7 +101,7 @@ export default function Form() {
         numberOfLines={5}
       />
 
-      <Text>Importance :</Text>
+      <Text>Priority :</Text>
       <SectionList
         sections={importanceData}
         keyExtractor={(item, index) => item + index}

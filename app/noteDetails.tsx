@@ -56,7 +56,7 @@ const NoteDetails = () => {
           <View>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.date}>{item.date}</Text>
-            <Text style={styles.importance}>Importance : {item.importance}</Text>
+            <Text style={styles.importance}>Priority : {item.importance}</Text>
             <Text style={styles.body}>{item.note}</Text>
 
             <View style={styles.buttonContainer}>
