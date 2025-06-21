@@ -3,87 +3,97 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+/**
+ * NoteDetails component displays the details of a single note.
+ * Allows the user to view, edit, or delete the note.
+ */
 const NoteDetails = () => {
-  const { id } = useLocalSearchParams();
-  const router = useRouter();
-  const [note, setNote] = useState<any>(null);
+  const { id } = useLocalSearchParams(); // Retrieves the note ID from the route parameters
+  const router = useRouter(); // Navigation object
+  const [note, setNote] = useState<any>(null); // State to hold the note details
 
-  
+  /**
+   * Fetches the note from AsyncStorage using the ID passed in route params.
+   * Runs once when the component is mounted or when the ID changes.
+   */
   useEffect(() => {
     const fetchNote = async () => {
-      const notesJSON = await AsyncStorage.getItem('notes');
-      const notes = notesJSON ? JSON.parse(notesJSON) : [];
-      const foundNote = notes.find((n: any) => n.id == id);
-      setNote(foundNote);
+      const notesJSON = await AsyncStorage.getItem('notes'); // Get stored notes
+      const notes = notesJSON ? JSON.parse(notesJSON) : [];  // Parse or initialize
+      const foundNote = notes.find((n: any) => n.id == id);  // Find the note with the given ID
+      setNote(foundNote); // Set the found note to state
     };
     fetchNote();
   }, [id]);
 
-  // the delete logic, it takes the id of the notes, delete it and then it take you back to the main page
+  /**
+   * Deletes the current note and navigates back to the main screen.
+   * It filters out the note with the matching ID and updates storage.
+   */
   const handleDelete = async () => {
     const notesJSON = await AsyncStorage.getItem('notes');
     const notes = notesJSON ? JSON.parse(notesJSON) : [];
-    const filtered = notes.filter((n: any) => n.id != id);
-    await AsyncStorage.setItem('notes', JSON.stringify(filtered));
-    router.replace('/');
+    const filtered = notes.filter((n: any) => n.id != id); // Remove the selected note
+    await AsyncStorage.setItem('notes', JSON.stringify(filtered)); // Save new list
+    router.replace('/'); // Navigate to the main screen
   };
 
-  // This if is used if there is no notes in the storage
+  // Show a loading message while note is being fetched
   if (!note) return <Text style={styles.loading}>Chargement...</Text>;
 
   return (
     <View style={styles.container}>
-      {/* section has been used so there is no problem with the nesting  */}
-  <SectionList
-    sections={[
-      {
-        title: 'NoteDetails',
-        data: [note]
-      }
-    ]}
-    keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-    renderItem={({ item }) => (
-      <View>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.date}>{item.date}</Text>
-        <Text style={styles.importance}>Importance : {item.importance}</Text>
-        <Text style={styles.body}>{item.note}</Text>
+      {/* Using SectionList for flexible rendering and to avoid nesting issues */}
+      <SectionList
+        sections={[
+          {
+            title: 'NoteDetails',
+            data: [note]
+          }
+        ]}
+        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+        renderItem={({ item }) => (
+          <View>
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.date}>{item.date}</Text>
+            <Text style={styles.importance}>Importance : {item.importance}</Text>
+            <Text style={styles.body}>{item.note}</Text>
 
-        <View style={styles.buttonContainer}>
-          {/* touchableOpacity is used to give more personality to the buttons while it can handle the logic for the editing */}
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() =>
-              router.push({
-                pathname: '/form',
-                params: {
-                  id: item.id.toString(),
-                  title: item.title,
-                  note: item.note,
-                  importance: item.importance,
-                },
-              })
-            }
-          >
-            <Text style={styles.editButtonText}>Edit</Text>
-          </TouchableOpacity>
-            
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <Text style={styles.deleteButtonText}>Delete</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    )}
-    renderSectionHeader={() => null}
-  />
-</View>
+            <View style={styles.buttonContainer}>
+              {/* Edit button navigates to the form with the note data as parameters */}
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() =>
+                  router.push({
+                    pathname: '/form',
+                    params: {
+                      id: item.id.toString(),
+                      title: item.title,
+                      note: item.note,
+                      importance: item.importance,
+                    },
+                  })
+                }
+              >
+                <Text style={styles.editButtonText}>Edit</Text>
+              </TouchableOpacity>
+              
+              {/* Delete button triggers the handleDelete function */}
+              <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+                <Text style={styles.deleteButtonText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+        renderSectionHeader={() => null} // No visible section header
+      />
+    </View>
   );
 };
 
 export default NoteDetails;
 
-
-// The css of the page using StyleSheet
+// Styles for the NoteDetails screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -122,7 +132,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     gap: 10,
   },
-    loading: {
+  loading: {
     color: '#fff',
     fontFamily: 'Montserrat',
     padding: 20,
