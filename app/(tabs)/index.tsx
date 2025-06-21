@@ -1,9 +1,8 @@
-// NotePage.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, SectionList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SectionList, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import Toast from 'react-native-toast-message';
+
 
 type Note = {
   id: number;

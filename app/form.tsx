@@ -3,59 +3,72 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, SectionList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-
+/**
+ * Form component allowing users to add or edit notes.
+ * Notes include a title, content, and an importance level.
+ * Data is persisted locally using AsyncStorage.
+ */
 export default function Form() {
+  // States for form inputs
   const [title, setTitle] = useState('');
   const [note, setNote] = useState('');
   const [selectedImportance, setSelectedImportance] = useState('');
   const [editId, setEditId] = useState<number | null>(null);
 
+  // Navigation hooks
   const router = useRouter();
   const params = useLocalSearchParams();
   const { id, title: paramTitle, note: paramNote, importance: paramImportance } = useLocalSearchParams();
 
-
-// const handleSubmit qui va, à l'aide de async storage, d'abord envoyé une alerte d'erreur si aucun champ n'est rempli
+  /**
+   * Submits the form.
+   * - Validates that all fields are filled.
+   * - If `id` is provided, updates an existing note.
+   * - Otherwise, creates a new note.
+   * - Saves notes in AsyncStorage and redirects to home.
+   */
   const handleSubmit = async () => {
-  if (!title || !note || !selectedImportance) {
-    Alert.alert('Error', 'Enter the areas');
-    return; 
-  } else{
-    Alert.alert('The note has been saved')
-  }
+    if (!title || !note || !selectedImportance) {
+      Alert.alert('Error', 'Enter the areas');
+      return;
+    } else {
+      Alert.alert('The note has been saved');
+    }
 
-  const existingNotesJSON = await AsyncStorage.getItem('notes');
-  const existingNotes = existingNotesJSON ? JSON.parse(existingNotesJSON) : [];
+    // Fetch existing notes from AsyncStorage
+    const existingNotesJSON = await AsyncStorage.getItem('notes');
+    const existingNotes = existingNotesJSON ? JSON.parse(existingNotesJSON) : [];
 
-  let updatedNotes;
+    let updatedNotes;
 
-  if (id) {
-    // Modifier la note existante
-    updatedNotes = existingNotes.map((n: any) =>
-      n.id == id ? { ...n, title, note, importance: selectedImportance } : n
-    );
-  } else {
-    // Ajouter une nouvelle note
-    const newNote = {
-      id: Date.now(),
-      title,
-      note,
-      importance: selectedImportance,
-      date: new Date().toLocaleString()
-    };
-    updatedNotes = [...existingNotes, newNote];
-  }
+    if (id) {
+      // Update existing note
+      updatedNotes = existingNotes.map((n: any) =>
+        n.id == id ? { ...n, title, note, importance: selectedImportance } : n
+      );
+    } else {
+      // Create a new note
+      const newNote = {
+        id: Date.now(),
+        title,
+        note,
+        importance: selectedImportance,
+        date: new Date().toLocaleString()
+      };
+      updatedNotes = [...existingNotes, newNote];
+    }
 
-  await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
+    // Save updated notes to AsyncStorage
+    await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
 
-  // Reset
-  setTitle('');
-  setNote('');
-  setSelectedImportance('');
-  router.push('/');
-};
+    // Reset form and redirect
+    setTitle('');
+    setNote('');
+    setSelectedImportance('');
+    router.push('/');
+  };
 
-
+  // Data for the importance section list
   const importanceData = [
     {
       title: "Importance Level",
@@ -63,13 +76,16 @@ export default function Form() {
     }
   ];
 
-    useEffect(() => {
-  if (id && paramTitle && paramNote && paramImportance) {
-    setTitle(paramTitle as string);
-    setNote(paramNote as string);
-    setSelectedImportance(paramImportance as string);
-  }
-}, [id, paramTitle, paramNote, paramImportance]);
+  /**
+   * Populates the form fields when editing an existing note.
+   */
+  useEffect(() => {
+    if (id && paramTitle && paramNote && paramImportance) {
+      setTitle(paramTitle as string);
+      setNote(paramNote as string);
+      setSelectedImportance(paramImportance as string);
+    }
+  }, [id, paramTitle, paramNote, paramImportance]);
 
   return (
     <View>
@@ -82,7 +98,7 @@ export default function Form() {
         onChangeText={setNote}
         value={note}
         multiline
-         numberOfLines={5}
+        numberOfLines={5}
       />
 
       <Text>Importance :</Text>
@@ -102,15 +118,14 @@ export default function Form() {
         )}
       />
 
-    <TouchableOpacity onPress={handleSubmit} 
-    style= {styles.saveButton}>
-      <Text>Save</Text>
+      <TouchableOpacity onPress={handleSubmit} style={styles.saveButton}>
+        <Text>Save</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-// The css of the page using StyleSheet
+// Styles used in the form screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -145,7 +160,6 @@ const styles = StyleSheet.create({
     color: '#000',
     textAlignVertical: 'top',
     marginBottom: 15,
-    
   },
   sectionHeader: {
     fontFamily: 'Montserrat',
@@ -182,6 +196,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
     fontWeight: '600',
-    
   }
 });
